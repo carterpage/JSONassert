@@ -5,7 +5,7 @@ package org.skyscreamer.jsonassert;
  */
 public class JSONCompareResult {
     private boolean _success;
-    private String _message;
+    private StringBuilder _message;
     private String _field;
     private Object _expected;
     private Object _actual;
@@ -19,7 +19,7 @@ public class JSONCompareResult {
 
     private JSONCompareResult(boolean success, String message) {
         _success = success;
-        _message = message == null ? "" : message;
+        _message = new StringBuilder(message == null ? "" : message);
     }
 
     /**
@@ -43,7 +43,7 @@ public class JSONCompareResult {
      * @return String explaining why if the comparison failed
      */
     public String getMessage() {
-        return _message;
+        return _message.toString();
     }
 
     /**
@@ -85,13 +85,12 @@ public class JSONCompareResult {
         return _field;
     }
     
-    protected void fail(String message) {
+    public void fail(String message) {
         _success = false;
         if (_message.length() == 0) {
-            _message = message;
-        }
-        else {
-            _message += " ; " + message;
+            _message.append(message);
+        } else {
+            _message.append(" ; ").append(message);
         }
     }
 
@@ -101,21 +100,14 @@ public class JSONCompareResult {
      * @param expected Expected result
      * @param actual Actual result
      */
-    protected void fail(String field, Object expected, Object actual) {
+    public void fail(String field, Object expected, Object actual) {
         this._field = field;
         this._expected = expected;
         this._actual = actual;
         fail(formatFailureMessage(field, expected, actual));
     }
 
-    private String formatFailureMessage(String field, Object expected, Object actual) {
-        StringBuffer message= new StringBuffer();
-        message.append(field);
-        message.append("\nExpected: ");
-        message.append(expected + "");
-        message.append("\n     got: ");
-        message.append(actual + "");
-        message.append("\n");
-        return message.toString();
+    public String formatFailureMessage(String field, Object expected, Object actual) {
+        return field + "\nExpected: " + expected + "\n     got: " + actual + "\n";
     }
 }
